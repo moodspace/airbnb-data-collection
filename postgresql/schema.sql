@@ -150,14 +150,6 @@ START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 ALTER SEQUENCE neighborhood_neighborhood_id_seq OWNED BY neighborhood.neighborhood_id;
 
 --
--- TOC entry 189 (class 1259 OID 18007)
--- Name: search_area_search_area_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE search_area_search_area_id_seq
-START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-
---
 -- TOC entry 4649 (class 0 OID 0)
 -- Dependencies: 189
 -- Name: search_area_search_area_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
@@ -199,14 +191,6 @@ START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 --
 
 ALTER SEQUENCE survey_search_page_page_id_seq OWNED BY survey_progress_log.page_id;
-
---
--- TOC entry 195 (class 1259 OID 18032)
--- Name: survey_survey_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE survey_survey_id_seq
-START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 --
 -- TOC entry 4655 (class 0 OID 0)
@@ -292,20 +276,6 @@ ALTER TABLE ONLY room ADD CONSTRAINT room_pkey PRIMARY KEY (room_id,
                                                             survey_id);
 
 --
--- TOC entry 4461 (class 2606 OID 18015)
--- Name: search_area_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
---
-
-ALTER TABLE ONLY search_area ADD CONSTRAINT search_area_pkey PRIMARY KEY (search_area_id);
-
---
--- TOC entry 4467 (class 2606 OID 18040)
--- Name: survey_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
---
-
-ALTER TABLE ONLY survey ADD CONSTRAINT survey_pkey PRIMARY KEY (survey_id);
-
---
 -- TOC entry 4469 (class 2606 OID 18048)
 -- Name: survey_search_page_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace:
 --
@@ -343,11 +313,11 @@ BEGIN
 $BODY$ LANGUAGE plpgsql VOLATILE COST 100;
 
 
-ALTER FUNCTION trg_location() OWNER TO postgres;
+ALTER FUNCTION trg_location() OWNER TO YOUR_DB_USER;
 
 GRANT EXECUTE ON FUNCTION trg_location() TO PUBLIC;
 
-GRANT EXECUTE ON FUNCTION trg_location() TO postgres;
+GRANT EXECUTE ON FUNCTION trg_location() TO YOUR_DB_USER;
 
 --
 -- TOC entry 4473 (class 2620 OID 18116)
