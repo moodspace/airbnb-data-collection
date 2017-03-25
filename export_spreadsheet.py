@@ -267,7 +267,8 @@ def export_city_data(ab_config, city, project, format):
                     dfnb = df.pivot(index='neighborhood', columns='survey_date',
                                     values='listings')
                     dfnb.fillna(0)
-                    dfnb.to_excel(writer, sheet_name="Listings by neighborhood")
+                    dfnb.to_excel(
+                        writer, sheet_name="Listings by neighborhood")
             except pg.InternalError:
                 # Miami has no neighborhoods
                 pass
@@ -324,7 +325,8 @@ def main():
         if args.summary:
             export_city_summary(ab_config, args.city, args.project.lower())
         else:
-            export_city_data(ab_config, args.city, args.project.lower(), args.format)
+            export_city_data(ab_config, args.city,
+                             args.project.lower(), args.format)
     else:
         parser.print_help()
 

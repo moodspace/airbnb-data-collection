@@ -57,7 +57,8 @@ def init():
         config.read(config_file)
         # database
         global DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD
-        DB_HOST = config["DATABASE"]["db_host"] if ("db_host" in config["DATABASE"]) else None
+        DB_HOST = config["DATABASE"]["db_host"] if (
+            "db_host" in config["DATABASE"]) else None
         DB_PORT = config["DATABASE"]["db_port"]
         DB_NAME = config["DATABASE"]["db_name"]
         DB_USER = config["DATABASE"]["db_user"]
@@ -118,9 +119,9 @@ def connect():
             )
             if DB_HOST is not None:
                 cattr.update(dict(
-                            host=DB_HOST,
-                            port=DB_PORT,
-                            ))
+                    host=DB_HOST,
+                    port=DB_PORT,
+                ))
             connect.conn = psycopg2.connect(**cattr)
             connect.conn.set_client_encoding('UTF8')
         return connect.conn
@@ -158,7 +159,8 @@ def fix_version_table():
         cur.execute(sql)
         version_col = cur.fetchone()[0]
         if version_col:
-            logger.info("Check: schema_version table already has version column")
+            logger.info(
+                "Check: schema_version table already has version column")
         cur.close()
         conn.commit()
     except:
@@ -173,6 +175,7 @@ def fix_version_table():
         cur.execute(sql)
         cur.close()
         conn.commit()
+
 
 def fix_room_table():
     try:

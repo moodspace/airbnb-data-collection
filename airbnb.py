@@ -75,7 +75,8 @@ console_handler.setFormatter(ch_formatter)
 logger.addHandler(console_handler)
 
 # logging: set log file name, format, and level
-filelog_formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s%(message)s')
+filelog_formatter = logging.Formatter(
+    '%(asctime)-15s %(levelname)-8s%(message)s')
 logfile = str(datetime.now())
 logfile = logfile.replace(":", "_")
 logfile = logfile.replace(" ", "_")
@@ -93,6 +94,7 @@ class Listing():
     # Occasionally, a survey_id = None will happen, but for retrieving data
     # straight from the web site, and not stored in the database.
     """
+
     def __init__(self, config, room_id, survey_id, room_type=None):
         self.config = config
         self.room_id = room_id
@@ -145,9 +147,11 @@ class Listing():
                 if (key == "overall_satisfaction" and "reviews" not in
                         unassigned_values):
                     if val is None and self.reviews > 2:
-                        logger.debug("Room " + str(self.room_id) + ": No value for " + key)
+                        logger.debug("Room " + str(self.room_id) +
+                                     ": No value for " + key)
                 elif val is None:
-                    logger.debug("Room " + str(self.room_id) + ": No value for " + key)
+                    logger.debug("Room " + str(self.room_id) +
+                                 ": No value for " + key)
         return status
 
     def get_columns(self):
@@ -206,7 +210,8 @@ class Listing():
                         self.__insert()
                         return True
                     except psycopg2.IntegrityError:
-                        logger.debug("Room " + str(self.room_id) + ": already collected")
+                        logger.debug("Room " + str(self.room_id) +
+                                     ": already collected")
                         return False
         except psycopg2.OperationalError:
             # connection closed
@@ -267,7 +272,8 @@ class Listing():
             print_string += "\n\tlatitude:\t" + str(self.latitude)
             print_string += "\n\tlongitude:\t" + str(self.longitude)
             print_string += "\n\tminstay:\t" + str(self.minstay)
-            print_string += "\n\tcoworker_hosted:\t" + str(self.coworker_hosted)
+            print_string += "\n\tcoworker_hosted:\t" + \
+                str(self.coworker_hosted)
             print_string += "\n\tlanguages:\t" + str(self.extra_host_languages)
             print_string += "\n\tproperty_type:\t" + str(self.property_type)
             print(print_string)
@@ -358,12 +364,13 @@ class Listing():
                 self.latitude, self.longitude, self.survey_id,
                 self.coworker_hosted, self.extra_host_languages, self.name,
                 self.property_type, self.currency, self.rate_type
-                )
+            )
             cur.execute(sql, insert_args)
             cur.close()
             conn.commit()
             logger.debug("Room " + str(self.room_id) + ": inserted")
-            logger.debug("(lat, long) = ({lat:+.5f}, {lng:+.5f})".format(lat=self.latitude, lng=self.longitude))
+            logger.debug(
+                "(lat, long) = ({lat:+.5f}, {lng:+.5f})".format(lat=self.latitude, lng=self.longitude))
         except psycopg2.IntegrityError:
             # logger.info("Room " + str(self.room_id) + ": insert failed")
             conn.rollback()
@@ -405,7 +412,7 @@ class Listing():
                 self.property_type, self.currency, self.rate_type,
                 self.room_id,
                 self.survey_id,
-                )
+            )
             logger.debug("Executing...")
             cur.execute(sql, update_args)
             rowcount = cur.rowcount
@@ -425,7 +432,7 @@ class Listing():
             temp = tree.xpath(
                 "//meta[contains(@property,'airbedandbreakfast:country')]"
                 "/@content"
-                )
+            )
             if len(temp) > 0:
                 self.country = temp[0]
         except:
@@ -436,7 +443,7 @@ class Listing():
             temp = tree.xpath(
                 "//meta[contains(@property,'airbedandbreakfast:city')]"
                 "/@content"
-                )
+            )
             if len(temp) > 0:
                 self.city = temp[0]
         except:
@@ -449,7 +456,7 @@ class Listing():
             temp = tree.xpath(
                 "//meta[contains(@property,'airbedandbreakfast:rating')]"
                 "/@content"
-                )
+            )
             if s is not None:
                 j = json.loads(s[0])
                 self.overall_satisfaction = j["listing"]["star_rating"]
@@ -521,7 +528,7 @@ class Listing():
                 "//div[@class='col-md-6']"
                 "/div/span[text()[contains(.,'Room type:')]]"
                 "/../strong/text()"
-                )
+            )
             if len(temp) > 0:
                 self.room_type = temp[0].strip()
             else:
@@ -530,21 +537,21 @@ class Listing():
                     "//div[@id='summary']"
                     "//i[contains(concat(' ', @class, ' '),"
                     " ' icon-entire-place ')]"
-                    )
+                )
                 if len(temp_entire) > 0:
                     self.room_type = "Entire home/apt"
                 temp_private = tree.xpath(
                     "//div[@id='summary']"
                     "//i[contains(concat(' ', @class, ' '),"
                     " ' icon-private-room ')]"
-                    )
+                )
                 if len(temp_private) > 0:
                     self.room_type = "Private room"
                 temp_shared = tree.xpath(
                     "//div[@id='summary']"
                     "//i[contains(concat(' ', @class, ' '),"
                     " ' icon-shared-room ')]"
-                    )
+                )
                 if len(temp_shared) > 0:
                     self.room_type = "Shared room"
         except:
@@ -554,13 +561,13 @@ class Listing():
         try:
             temp2 = tree.xpath(
                 "//div[contains(@class,'rich-toggle')]/@data-address"
-                )
+            )
             temp1 = tree.xpath("//table[@id='description_details']"
                                "//td[text()[contains(.,'Neighborhood:')]]"
                                "/following-sibling::td/descendant::text()")
             if len(temp2) > 0:
                 temp = temp2[0].strip()
-                self.neighborhood = temp[temp.find("(")+1:temp.find(")")]
+                self.neighborhood = temp[temp.find("(") + 1:temp.find(")")]
             elif len(temp1) > 0:
                 self.neighborhood = temp1[0].strip()
             if self.neighborhood is not None:
@@ -572,7 +579,7 @@ class Listing():
         try:
             temp = tree.xpath(
                 "//div[contains(@class,'rich-toggle')]/@data-address"
-                )
+            )
             if len(temp) > 0:
                 temp = temp[0].strip()
                 self.address = temp[:temp.find(",")]
@@ -581,7 +588,7 @@ class Listing():
                 temp = tree.xpath(
                     "//span[@id='display-address']"
                     "/@data-location"
-                    )
+                )
                 if len(temp) > 0:
                     self.address = temp[0]
         except:
@@ -595,7 +602,7 @@ class Listing():
             temp2 = tree.xpath(
                 "//div[@class='___iso-state___p3summarybundlejs']"
                 "/@data-state"
-                )
+            )
             if s is not None:
                 j = json.loads(s[0])
                 self.reviews = \
@@ -616,7 +623,7 @@ class Listing():
                 # try old page match
                 temp = tree.xpath(
                     "//span[@itemprop='reviewCount']/text()"
-                    )
+                )
                 if len(temp) > 0:
                     self.reviews = temp[0]
             if self.reviews is not None:
@@ -635,7 +642,7 @@ class Listing():
                 "//div[@class='col-md-6']"
                 "/div/span[text()[contains(.,'Accommodates:')]]"
                 "/../strong/text()"
-                )
+            )
             if s is not None:
                 j = json.loads(s[0])
                 self.accommodates = j["listing"]["person_capacity"]
@@ -647,7 +654,7 @@ class Listing():
                     "//div[@class='col-md-6']"
                     "/div[text()[contains(.,'Accommodates:')]]"
                     "/strong/text()"
-                    )
+                )
                 if len(temp) > 0:
                     self.accommodates = temp[0].strip()
                 else:
@@ -671,7 +678,7 @@ class Listing():
                 "//div[@class='col-md-6']"
                 "/div/span[text()[contains(.,'Bedrooms:')]]"
                 "/../strong/text()"
-                )
+            )
             if len(temp) > 0:
                 self.bedrooms = temp[0].strip()
             else:
@@ -679,7 +686,7 @@ class Listing():
                     "//div[@class='col-md-6']"
                     "/div[text()[contains(.,'Bedrooms:')]]"
                     "/strong/text()"
-                    )
+                )
                 if len(temp) > 0:
                     self.bedrooms = temp[0].strip()
             if self.bedrooms:
@@ -695,7 +702,7 @@ class Listing():
                 "//div[@class='col-md-6']"
                 "/div/span[text()[contains(.,'Bathrooms:')]]"
                 "/../strong/text()"
-                )
+            )
             if len(temp) > 0:
                 self.bathrooms = temp[0].strip()
             else:
@@ -703,7 +710,7 @@ class Listing():
                     "//div[@class='col-md-6']"
                     "/div/span[text()[contains(.,'Bathrooms:')]]"
                     "/../strong/text()"
-                    )
+                )
                 if len(temp) > 0:
                     self.bathrooms = temp[0].strip()
             if self.bathrooms:
@@ -720,17 +727,17 @@ class Listing():
                 "//div[contains(@class,'col-md-6')"
                 "and text()[contains(.,'minimum stay')]]"
                 "/strong/text()"
-                )
+            )
             temp2 = tree.xpath(
                 "//div[@id='details-column']"
                 "//div[contains(text(),'Minimum Stay:')]"
                 "/strong/text()"
-                )
+            )
             temp1 = tree.xpath(
                 "//table[@id='description_details']"
                 "//td[text()[contains(.,'Minimum Stay:')]]"
                 "/following-sibling::td/descendant::text()"
-                )
+            )
             if len(temp3) > 0:
                 self.minstay = temp3[0].strip()
             elif len(temp2) > 0:
@@ -748,10 +755,10 @@ class Listing():
         try:
             temp2 = tree.xpath(
                 "//meta[@itemprop='price']/@content"
-                )
+            )
             temp1 = tree.xpath(
                 "//div[@id='price_amount']/text()"
-                )
+            )
             if len(temp2) > 0:
                 self.price = temp2[0]
             elif len(temp1) > 0:
@@ -949,8 +956,10 @@ class Survey():
             zoomstack_str = ''
             for zs in zoomstack:
                 zoomstack_str = zoomstack_str + str(zs)
-            page_info = (self.survey_id, room_type, guests, zoomstack_str, page_number, has_rooms)
-            logger.debug("Survey search progress  - bounding box: " + str(page_info))
+            page_info = (self.survey_id, room_type, guests,
+                         zoomstack_str, page_number, has_rooms)
+            logger.debug(
+                "Survey search progress  - bounding box: " + str(page_info))
             sql_insert = """
             insert into survey_progress_log
             (survey_id, room_type,
@@ -1061,7 +1070,8 @@ class Survey():
                     max_guests = self.config.SEARCH_MAX_GUESTS
                 for guests in range(1, max_guests):
                     for i in range(len(price_increments) - 1):
-                        price_range = [price_increments[i], price_increments[i+1]]
+                        price_range = [price_increments[i],
+                                       price_increments[i + 1]]
                         # TS: move this max_price thing out of the loop
                         max_price = {"Private room": 500,
                                      "Entire home/apt": 10000,
@@ -1108,14 +1118,16 @@ class Survey():
 
             logger.info("Bounding box: " + str(bounding_box))
 
-            # check for resume information for partially completed surveys in logger
+            # check for resume information for partially completed surveys in
+            # logger
             try:
                 cur = conn.cursor()
                 cur.execute("""
                         select room_type, page_number, guests, zoomstack
                         from survey_progress_log
                         where survey_id = %s """, (self.survey_id,))
-                (log_room_type, log_page_number, log_guests, log_zoomstack_str) = cur.fetchone()
+                (log_room_type, log_page_number, log_guests,
+                 log_zoomstack_str) = cur.fetchone()
                 cur.close()
                 log_zoomstack = []
                 # turn zoomstack string into list
@@ -1138,7 +1150,8 @@ class Survey():
             # skip outer loops according to log state and propagate zoomstack and page number
             # inward on logged room_type
             # NB: THERE SEEMS TO BE NO POINT IN ITERATING OVER GUEST NUMBERS -
-            # 1 GUEST SHOULD RETURN EVERYTHING - SO STRIPPED LOOP TO ROOM TYPES ONLY
+            # 1 GUEST SHOULD RETURN EVERYTHING - SO STRIPPED LOOP TO ROOM TYPES
+            # ONLY
             guests = 1
             rectangle_zoom = 0
             for room_type in ("Private room", "Entire home/apt", "Shared room"):
@@ -1146,14 +1159,17 @@ class Survey():
                 if log_resuming and not (room_type == log_room_type):
                     logger.info("skipping room type %s", room_type)
                     continue
-                # if resuming and at logged room_type, search and propagate zoomstack and page number from logs inward
+                # if resuming and at logged room_type, search and propagate
+                # zoomstack and page number from logs inward
                 elif log_resuming and room_type == log_room_type:
                     log_resuming = False
                     self.__search_rectangle_logged(room_type, guests, bounding_box,
                                                    rectangle_zoom, flag, [], log_zoomstack, log_page_number)
-                # if not resuming or have already done resume loop, continue with no resume info
+                # if not resuming or have already done resume loop, continue
+                # with no resume info
                 else:
-                    self.__search_rectangle_logged(room_type, guests, bounding_box, rectangle_zoom, flag, [], [], 1)
+                    self.__search_rectangle_logged(
+                        room_type, guests, bounding_box, rectangle_zoom, flag, [], [], 1)
         except Exception:
             logger.exception("Error")
 
@@ -1177,7 +1193,7 @@ class Survey():
             # The max zoom is set in config, but decrease it by one for each guest
             # so that high guest counts don't zoom in (which turns out to generate
             # very few new rooms but take a lot of time)
-            if rectangle_zoom < max(1, (self.config.SEARCH_MAX_RECTANGLE_ZOOM - 2 *(guests - 1))):
+            if rectangle_zoom < max(1, (self.config.SEARCH_MAX_RECTANGLE_ZOOM - 2 * (guests - 1))):
                 zoomable = True
             else:
                 zoomable = False
@@ -1190,8 +1206,8 @@ class Survey():
                 # break the rectangle into quadrants
                 # (n_lat, e_lng, s_lat, w_lng).
                 (n_lat, e_lng, s_lat, w_lng) = rectangle
-                mid_lat = (n_lat + s_lat)/2.0
-                mid_lng = (e_lng + w_lng)/2.0
+                mid_lat = (n_lat + s_lat) / 2.0
+                mid_lng = (e_lng + w_lng) / 2.0
                 rectangle_zoom += 1
                 # overlap quadrants to ensure coverage at high zoom levels
                 # Airbnb max zoom (18) is about 0.004 on a side.
@@ -1274,7 +1290,8 @@ class Survey():
     def __search_rectangle_logged(self, room_type, guests, rectangle,
                                   rectangle_zoom, flag, zoomstack, zoomresume, pageresume):
         # zoomresume is a list of zoom quadrants to skip to when resuming a search from a log
-        # zoomstack is the list of zoom quadrants up the call stack, to be saved for resuming
+        # zoomstack is the list of zoom quadrants up the call stack, to be
+        # saved for resuming
 
         logger.debug("search_rectangle_logged rectangle: %s, zoom: %d, zoomstack: %s, zoomresume: %s, pageresume: %d",
                      str(rectangle), rectangle_zoom, str(zoomstack), str(zoomresume), pageresume)
@@ -1296,7 +1313,8 @@ class Survey():
                                                                               flag, zoomstack, pageresume)
             logger.info(("{room_type} ({g} guests): zoom {rect_zoom}: "
                          "{new_rooms} new rooms.").format(room_type=room_type, g=str(guests),
-                                                          rect_zoom=str(rectangle_zoom),
+                                                          rect_zoom=str(
+                                                              rectangle_zoom),
                                                           new_rooms=str(new_rooms)))
 
         zoomable = True if rectangle_zoom < self.config.SEARCH_MAX_RECTANGLE_ZOOM else False
@@ -1305,8 +1323,8 @@ class Survey():
             # break the rectangle into quadrants
             # (n_lat, e_lng, s_lat, w_lng).
             (n_lat, e_lng, s_lat, w_lng) = rectangle
-            mid_lat = (n_lat + s_lat)/2.0
-            mid_lng = (e_lng + w_lng)/2.0
+            mid_lat = (n_lat + s_lat) / 2.0
+            mid_lng = (e_lng + w_lng) / 2.0
             rectangle_zoom += 1
             # overlap quadrants to ensure coverage at high zoom levels
             # Airbnb max zoom (18) is about 0.004 on a side.
@@ -1322,12 +1340,13 @@ class Survey():
                 pr = pageresume
             while i < 5:
                 if i == 1:
-                    quadrant = (n_lat + blur, e_lng - blur, mid_lat - blur, mid_lng + blur)
+                    quadrant = (n_lat + blur, e_lng - blur,
+                                mid_lat - blur, mid_lng + blur)
                     # SK TOCHECK: QUADRANT COORDS for all of these
                     logger.debug("NE Quadrant: %s", str(quadrant))
                     logger.debug("Quadrant size: {lat} by {lng}".format(
-                                                             lat=str(quadrant[0] - quadrant[2]),
-                                                             lng=str(abs(quadrant[1] - quadrant[3]))))
+                        lat=str(quadrant[0] - quadrant[2]),
+                        lng=str(abs(quadrant[1] - quadrant[3]))))
 
                     newzoomstack = zoomstack + [1]
                     # logger.debug("zs: %s, newzs: %s", str(zoomstack), str(newzoomstack))
@@ -1335,37 +1354,41 @@ class Survey():
                                                    quadrant, rectangle_zoom, flag,
                                                    newzoomstack, newzoomresume, pr)
                 elif i == 2:
-                    quadrant = (n_lat + blur, mid_lng - blur, mid_lat - blur, w_lng + blur)
+                    quadrant = (n_lat + blur, mid_lng - blur,
+                                mid_lat - blur, w_lng + blur)
                     logger.debug("NW Quadrant: %s", str(quadrant))
                     logger.debug("Quadrant size: {lat} by {lng}".format(
-                                                                         lat=str(quadrant[0] - quadrant[2]),
-                                                                         lng=str(abs(quadrant[1] - quadrant[3]))))
+                        lat=str(quadrant[0] - quadrant[2]),
+                        lng=str(abs(quadrant[1] - quadrant[3]))))
                     newzoomstack = zoomstack + [2]
                     self.__search_rectangle_logged(room_type, guests,
                                                    quadrant, rectangle_zoom, flag, newzoomstack, newzoomresume, pr)
 
                 elif i == 3:
-                    quadrant = (mid_lat + blur, e_lng - blur, s_lat - blur, mid_lng + blur)
+                    quadrant = (mid_lat + blur, e_lng - blur,
+                                s_lat - blur, mid_lng + blur)
 
                     logger.debug("SE Quadrant: %s", str(quadrant))
                     logger.debug("Quadrant size: {lat} by {lng}".format(
-                                                                         lat=str(quadrant[0] - quadrant[2]),
-                                                                         lng=str(abs(quadrant[1] - quadrant[3]))))
+                        lat=str(quadrant[0] - quadrant[2]),
+                        lng=str(abs(quadrant[1] - quadrant[3]))))
 
                     newzoomstack = zoomstack + [3]
                     self.__search_rectangle_logged(room_type, guests,
                                                    quadrant, rectangle_zoom, flag, newzoomstack, newzoomresume, pr)
 
                 elif i == 4:
-                    quadrant = (mid_lat + blur, mid_lng - blur, s_lat - blur, w_lng + blur)
+                    quadrant = (mid_lat + blur, mid_lng - blur,
+                                s_lat - blur, w_lng + blur)
                     logger.debug("SW Quadrant: %s", str(quadrant))
                     logger.debug("Quadrant size: {lat} by {lng}".format(
-                                                                         lat=str(quadrant[0] - quadrant[2]),
-                                                                         lng=str(abs(quadrant[1] - quadrant[3]))))
+                        lat=str(quadrant[0] - quadrant[2]),
+                        lng=str(abs(quadrant[1] - quadrant[3]))))
                     newzoomstack = zoomstack + [4]
                     self.__search_rectangle_logged(room_type, guests,
                                                    quadrant, rectangle_zoom, flag, newzoomstack, newzoomresume, pr)
-                # no matter what, we will only be resuming on first iteration of loop
+                # no matter what, we will only be resuming on first iteration
+                # of loop
                 newzoomresume = []
                 pr = 1
                 i += 1
@@ -1409,11 +1432,11 @@ class Survey():
                     room_count = self.__search_neighborhood_page(
                         room_type, neighborhood, guests, page_number, flag)
                     logger.info(("{room_type} ({g} guests): neighbourhood {neighborhood}: "
-                         "{room_count} rooms, {page_number} pages").format(
-                             room_type=room_type, g=str(guests),
-                             neighborhood = neighborhood,
-                             room_count = room_count,
-                             page_number=str(page_number)))
+                                 "{room_count} rooms, {page_number} pages").format(
+                        room_type=room_type, g=str(guests),
+                        neighborhood=neighborhood,
+                        room_count=room_count,
+                        page_number=str(page_number)))
 
                     if flag == FLAGS_PRINT:
                         # for FLAGS_PRINT, fetch one page and print it
@@ -1442,13 +1465,15 @@ class Survey():
             params["location"] = self.search_area_name
             params["room_types[]"] = room_type
             params["neighborhoods[]"] = neighborhood
-            response = ws_request_with_repeats(self.config, URL_API_SEARCH_ROOT, params)
+            response = ws_request_with_repeats(
+                self.config, URL_API_SEARCH_ROOT, params)
             json = response.json()
             for result in json["results_json"]["search_results"]:
                 room_id = int(result["listing"]["id"])
                 if room_id is not None:
                     room_count += 1
-                    listing = self.listing_from_search_page_json(result, self, room_id, room_type)
+                    listing = self.listing_from_search_page_json(
+                        result, self, room_id, room_type)
                     if listing is None:
                         continue
                     if listing.host_id is not None:
@@ -1480,7 +1505,8 @@ class Survey():
 
     def listing_from_search_page_json(self, result, survey, room_id, room_type):
         try:
-            listing = Listing(self.config, room_id, survey.survey_id, room_type)
+            listing = Listing(self.config, room_id,
+                              survey.survey_id, room_type)
             # listing information
             json_listing = result["listing"]
             listing.host_id = json_listing["primary_host"]["id"] if "primary_host" in json_listing else None
@@ -1503,7 +1529,8 @@ class Survey():
             listing.rate_type = json_pricing["rate_type"] if "rate_type" in json_pricing else None
             return listing
         except:
-            logger.exception("Error in survey.listing_from_search_page_json: returning None")
+            logger.exception(
+                "Error in survey.listing_from_search_page_json: returning None")
             sys.exit(-1)
             return None
 
@@ -1970,14 +1997,16 @@ def ws_search_rectangle(survey, room_type, guests, price_range,
             params["search_by_map"] = str(True)
             params["price_min"] = str(price_range[0])
             params["price_max"] = str(price_range[1])
-            response = ws_request_with_repeats(survey.config, URL_API_SEARCH_ROOT, params)
+            response = ws_request_with_repeats(
+                survey.config, URL_API_SEARCH_ROOT, params)
             json = response.json()
             for result in json["results_json"]["search_results"]:
                 room_id = int(result["listing"]["id"])
                 if room_id is not None:
                     room_count += 1
                     room_total += 1
-                    listing = survey.listing_from_search_page_json(result, survey, room_id, room_type)
+                    listing = survey.listing_from_search_page_json(
+                        result, survey, room_id, room_type)
                     if listing is None:
                         continue
                     if listing.host_id is not None:
@@ -2018,8 +2047,8 @@ def ws_search_rectangle_logged(survey, room_type, guests,
         logger.info("-" * 70)
         logger.info(("Searching '{room_type}' ({guests} guests), "
                      "zoom {zoom}").format(room_type=room_type,
-                                                 guests=str(guests),
-                                                 zoom=str(rectangle_zoom)))
+                                           guests=str(guests),
+                                           zoom=str(rectangle_zoom)))
         new_rooms = 0
         room_total = 0
         if rectangle_zoom >= (survey.config.SEARCH_MAX_RECTANGLE_ZOOM - 1):
@@ -2044,9 +2073,11 @@ def ws_search_rectangle_logged(survey, room_type, guests,
             params["sw_lng"] = str(rectangle[3])
             params["ne_lat"] = str(rectangle[0])
             params["ne_lng"] = str(rectangle[1])
-            # testing -- SK added to force airbnb to only return results within rectangle
+            # testing -- SK added to force airbnb to only return results within
+            # rectangle
             params["search_by_map"] = str(True)
-            response = ws_request_with_repeats(survey.config, URL_API_SEARCH_ROOT, params)
+            response = ws_request_with_repeats(
+                survey.config, URL_API_SEARCH_ROOT, params)
             # Airbnb update 2016-11-05: some responses contain no property_ids
             # key: pick up the room_id from elsewhere
             # (Could get more info)
@@ -2099,8 +2130,10 @@ def ws_search_rectangle_logged(survey, room_type, guests,
                 # for FLAGS_PRINT, fetch one page and print it
                 sys.exit(0)
             page_number += 1
-            # log progress on this survey in DB - survey id, room_type, zoomstack, page_number are the important ones
-            survey.log_progress_bounding_box(room_type, guests, zoomstack, page_number, room_count)
+            # log progress on this survey in DB - survey id, room_type,
+            # zoomstack, page_number are the important ones
+            survey.log_progress_bounding_box(
+                room_type, guests, zoomstack, page_number, room_count)
 
             if room_count < SEARCH_LISTINGS_ON_FULL_PAGE:
                 logger.debug("Final page of listings for this search")
@@ -2109,12 +2142,13 @@ def ws_search_rectangle_logged(survey, room_type, guests,
             if new_rooms >= truncate_criterion:
                 logger.info(("Found {new_rooms} new rooms "
                              "Truncating search and zooming in").format(
-                                                                    new_rooms=str(new_rooms)))
+                    new_rooms=str(new_rooms)))
                 break
             if page_number > survey.config.SEARCH_MAX_PAGES:
                 logger.debug("Reached MAX_PAGES on this search!")
 
-        logger.debug("Found %d new_rooms of %d room_total", new_rooms, room_total)
+        logger.debug("Found %d new_rooms of %d room_total",
+                     new_rooms, room_total)
         return (new_rooms, room_total, page_number)
     except UnicodeEncodeError:
         logger.error("UnicodeEncodeError: set PYTHONIOENCODING=utf-8")
@@ -2142,13 +2176,15 @@ def ws_get_search_page_info_zipcode(survey, room_type,
         params["source"] = "filter"
         params["location"] = zipcode
         params["room_types[]"] = room_type
-        response = ws_request_with_repeats(survey.config, URL_API_SEARCH_ROOT, params)
+        response = ws_request_with_repeats(
+            survey.config, URL_API_SEARCH_ROOT, params)
         json = response.json()
         for result in json["results_json"]["search_results"]:
             room_id = int(result["listing"]["id"])
             if room_id is not None:
                 room_count += 1
-                listing = survey.listing_from_search_page_json(result, survey, room_id, room_type)
+                listing = survey.listing_from_search_page_json(
+                    result, survey, room_id, room_type)
                 if listing is None:
                     continue
                 if listing.host_id is not None:
@@ -2276,7 +2312,6 @@ def page_has_been_retrieved(config, survey_id, room_type, neighborhood_or_zipcod
     finally:
         cur.close()
         return has_rooms
-
 
 
 def parse_args():
@@ -2432,6 +2467,7 @@ def main():
     except Exception:
         logger.exception("Top level exception handler: quitting.")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
